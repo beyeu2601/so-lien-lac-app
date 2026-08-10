@@ -24,10 +24,10 @@ const CONFIG = {
   fontFamily: "HP001_5_hang_bold",
   color: "#0f1b81", // Màu xanh mực bút bi thực tế
   fields: {
-    session: { x: 350, y: 250, maxWidth: 150, fontSize: 36 },
-    date: { x: 720, y: 250, maxWidth: 240, fontSize: 36 },
-    teacher: { x: 390, y: 310, maxWidth: 570, fontSize: 36 },
-    tutor: { x: 410, y: 370, maxWidth: 550, fontSize: 36 },
+    session: { x: 340, y: 250, maxWidth: 150, fontSize: 36 },
+    date: { x: 660, y: 250, maxWidth: 240, fontSize: 36 },
+    teacher: { x: 380, y: 310, maxWidth: 570, fontSize: 36 },
+    tutor: { x: 400, y: 370, maxWidth: 550, fontSize: 36 },
     content: { x: 120, y: 480, width: 840, height: 160, fontSize: 34, lineGap: 14 },
     comments: { x: 120, y: 700, width: 840, height: 160, fontSize: 34, lineGap: 14 },
     homework: { x: 120, y: 920, width: 840, height: 200, fontSize: 34, lineGap: 14 },
@@ -64,10 +64,10 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     loadFont();
   }, []);
 
-  // Tải phôi ảnh mặc định duy nhất
+  // Tải phôi ảnh mặc định duy nhất (thêm timestamp để tránh cache trình duyệt)
   useEffect(() => {
     const img = new Image();
-    img.src = "/templates/so-lien-lac-template.png";
+    img.src = "/templates/so-lien-lac-template.png?t=" + Date.now();
     img.onload = () => setImageLoaded(img);
     img.onerror = () => {
       console.error("Không thể tải phôi ảnh mặc định tại public/templates/so-lien-lac-template.png");
