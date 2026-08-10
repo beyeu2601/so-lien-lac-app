@@ -12,6 +12,7 @@ export interface FormData {
 
 interface CanvasEditorProps {
   data: FormData;
+  fontFamily: string;
 }
 
 export interface CanvasEditorRef {
@@ -19,23 +20,22 @@ export interface CanvasEditorRef {
   isReady: boolean;
 }
 
-// Hệ tọa độ được tối ưu hóa chuẩn xác (Dịch lên thêm 5px nữa cho Buổi, Ngày, Giảng viên)
+// Hệ tọa độ dịch lên trên 50 và dịch sang trái 50 theo yêu cầu
 const CONFIG = {
-  fontFamily: "HP001_5_hang_bold",
   color: "#0f1b81", // Màu xanh mực bút bi thực tế
   fields: {
-    session: { x: 340, y: 250, maxWidth: 150, fontSize: 36 },
-    date: { x: 660, y: 250, maxWidth: 240, fontSize: 36 },
-    teacher: { x: 380, y: 310, maxWidth: 570, fontSize: 36 },
-    tutor: { x: 400, y: 370, maxWidth: 550, fontSize: 36 },
-    content: { x: 120, y: 480, width: 840, height: 160, fontSize: 34, lineGap: 14 },
-    comments: { x: 120, y: 700, width: 840, height: 160, fontSize: 34, lineGap: 14 },
-    homework: { x: 120, y: 920, width: 840, height: 200, fontSize: 34, lineGap: 14 },
+    session: { x: 290, y: 200, maxWidth: 150, fontSize: 36 },
+    date: { x: 610, y: 200, maxWidth: 240, fontSize: 36 },
+    teacher: { x: 330, y: 260, maxWidth: 570, fontSize: 36 },
+    tutor: { x: 350, y: 320, maxWidth: 550, fontSize: 36 },
+    content: { x: 70, y: 430, width: 840, height: 160, fontSize: 34, lineGap: 14 },
+    comments: { x: 70, y: 650, width: 840, height: 160, fontSize: 34, lineGap: 14 },
+    homework: { x: 70, y: 870, width: 840, height: 200, fontSize: 34, lineGap: 14 },
   },
 };
 
 const CanvasEditor = forwardRef(function CanvasEditor(
-  { data }: CanvasEditorProps,
+  { data, fontFamily }: CanvasEditorProps,
   ref: ForwardedRef<CanvasEditorRef>
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -43,26 +43,26 @@ const CanvasEditor = forwardRef(function CanvasEditor(
   const [fontLoaded, setFontLoaded] = useState(false);
   const [imgDataUrl, setImgDataUrl] = useState<string>("");
 
-  // Chờ load font viết chữ đẹp
+  // Chờ load font viết chữ đẹp đang được chọn
   useEffect(() => {
     setFontLoaded(false);
     
-    if (document.fonts.check(`12px "${CONFIG.fontFamily}"`)) {
+    if (document.fonts.check(`12px "${fontFamily}"`)) {
       setFontLoaded(true);
       return;
     }
 
     const loadFont = async () => {
       try {
-        await document.fonts.load(`12px "${CONFIG.fontFamily}"`);
+        await document.fonts.load(`12px "${fontFamily}"`);
         setFontLoaded(true);
       } catch (err) {
-        console.error("Lỗi tải font HP001:", err);
+        console.error(`Lỗi tải font ${fontFamily}:`, err);
         setFontLoaded(true); // Fallback
       }
     };
     loadFont();
-  }, []);
+  }, [fontFamily]);
 
   // Tải phôi ảnh mặc định duy nhất (thêm timestamp để tránh cache trình duyệt)
   useEffect(() => {
@@ -94,7 +94,7 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     // Hàm vẽ chữ đơn giản (Buổi, Ngày, Giảng viên, Trợ giảng)
     const drawSimpleText = (text: string, field: "session" | "date" | "teacher" | "tutor") => {
       const cfg = CONFIG.fields[field];
-      ctx.font = `${cfg.fontSize}px ${CONFIG.fontFamily}`;
+      ctx.font = `${cfg.fontSize}px "${fontFamily}"`;
       ctx.fillText(text, cfg.x, cfg.y, cfg.maxWidth);
     };
 
@@ -133,7 +133,7 @@ const CanvasEditor = forwardRef(function CanvasEditor(
 
       // Hàm tính toán bẻ dòng
       const calculateLines = (fontSize: number) => {
-        ctx.font = `${fontSize}px ${CONFIG.fontFamily}`;
+        ctx.font = `${fontSize}px "${fontFamily}"`;
         const calculatedLines: string[] = [];
         const paragraphs = processedText.split("\n");
 
@@ -165,7 +165,7 @@ const CanvasEditor = forwardRef(function CanvasEditor(
       }
 
       // Thực thi vẽ lên Canvas
-      ctx.font = `${currentFontSize}px ${CONFIG.fontFamily}`;
+      ctx.font = `${currentFontSize}px "${fontFamily}"`;
       let cursorY = cfg.y;
       lines.forEach((line) => {
         ctx.fillText(line.trim(), cfg.x, cursorY);
@@ -180,7 +180,7 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     // Export ra DataURL để hiển thị thẻ <img> hỗ trợ lưu trực tiếp trên điện thoại
     setImgDataUrl(canvas.toDataURL("image/jpeg", 0.9));
 
-  }, [data, fontLoaded, imageLoaded]);
+  }, [data, fontLoaded, imageLoaded, fontFamily]);
 
   useImperativeHandle(ref, () => ({
     download: async () => {

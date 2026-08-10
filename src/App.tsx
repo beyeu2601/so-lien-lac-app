@@ -9,6 +9,17 @@ const getTodayDateString = () => {
   return `${dd}/${mm}/${yyyy}`;
 };
 
+const FONTS = [
+  { name: "HP001_5_hang_bold", label: "HP001 5 Hàng Bold (Khuyên dùng)" },
+  { name: "HP001_5_hang_normal", label: "HP001 5 Hàng Normal" },
+  { name: "HP001_5_hang_1_o_ly", label: "HP001 5 Hàng (Có Ô Ly)" },
+  { name: "HP001_4_hang_bold", label: "HP001 4 Hàng Bold" },
+  { name: "HP001_4_hang_normal", label: "HP001 4 Hàng Normal" },
+  { name: "HP001_4_hang_1_o_ly", label: "HP001 4 Hàng (1 Ô Ly)" },
+  { name: "HP001_4_hang_2_o_ly", label: "HP001 4 Hàng (2 Ô Ly)" },
+  { name: "HLHOCTRO", label: "HL Học Trò (Nét thanh thoát)" },
+];
+
 function App() {
   const [formData, setFormData] = useState<FormData>({
     session: "",
@@ -19,6 +30,8 @@ function App() {
     comments: "",
     homework: "",
   });
+
+  const [fontFamily, setFontFamily] = useState(FONTS[0].name);
 
   const canvasRef = useRef<CanvasEditorRef>(null);
 
@@ -43,13 +56,33 @@ function App() {
             Trợ Lý Điền Sổ Liên Lạc Tự Động
           </h1>
           <p className="mt-2 text-lg text-gray-600">
-            Dùng duy nhất phôi chuẩn và font chữ luyện viết tiểu học HP001.
+            Dùng duy nhất phôi chuẩn và tùy chọn font chữ luyện viết tiểu học của bạn.
           </p>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Cột Form nhập liệu */}
           <div className="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
+            <div className="border-b pb-4">
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                Cấu Hình Chung
+              </h2>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Chọn Phông Chữ Luyện Viết
+              </label>
+              <select
+                value={fontFamily}
+                onChange={(e) => setFontFamily(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none bg-white text-sm"
+              >
+                {FONTS.map((font) => (
+                  <option key={font.name} value={font.name}>
+                    {font.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <h2 className="text-xl font-semibold text-gray-800 pb-2 border-b">
               Thông Tin Sổ Liên Lạc
             </h2>
@@ -64,7 +97,7 @@ function App() {
                     value={formData.session}
                     onChange={handleChange}
                     placeholder="Ví dụ: 12"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-sm"
                   />
                 </div>
                 <div>
@@ -75,7 +108,7 @@ function App() {
                     value={formData.date}
                     onChange={handleChange}
                     placeholder="10/08/2026"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-sm"
                   />
                 </div>
               </div>
@@ -88,7 +121,7 @@ function App() {
                   value={formData.teacher}
                   onChange={handleChange}
                   placeholder="Tên giảng viên"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-sm"
                 />
               </div>
 
@@ -100,7 +133,7 @@ function App() {
                   value={formData.tutor}
                   onChange={handleChange}
                   placeholder="Tên trợ giảng"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-sm"
                 />
               </div>
 
@@ -114,7 +147,7 @@ function App() {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Học bài mới...&#10;Làm bài tập..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none outline-none text-sm"
                 />
               </div>
 
@@ -128,7 +161,7 @@ function App() {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Con học tốt...&#10;Cần cố gắng thêm..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none outline-none text-sm"
                 />
               </div>
 
@@ -142,7 +175,7 @@ function App() {
                   onChange={handleChange}
                   rows={2}
                   placeholder="Làm bài tập trang 12..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none outline-none text-sm"
                 />
               </div>
             </div>
@@ -174,6 +207,7 @@ function App() {
               <CanvasEditor
                 ref={canvasRef}
                 data={formData}
+                fontFamily={fontFamily}
               />
               <p className="text-xs text-gray-400 text-center mt-2">
                 * Trên điện thoại: Nhấn giữ vào hình ảnh trên và chọn <strong>"Lưu vào ảnh" (Save to Photos)</strong> để lưu trực tiếp vào thư viện máy.
