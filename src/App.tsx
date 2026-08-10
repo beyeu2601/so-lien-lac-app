@@ -37,6 +37,12 @@ function VoiceInputButton({ isListening, onStart }: { isListening: boolean; onSt
   );
 }
 
+const capitalizeSentences = (text: string) => {
+  return text.replace(/(^[^a-zA-ZÀ-ỹ]*|[\.\!\?]\s+)([a-zà-ỹ])/gm, (match, p1, p2) => {
+    return p1 + p2.toUpperCase();
+  });
+};
+
 function App() {
   const [formData, setFormData] = useState<FormData>({
     studentName: "",
@@ -58,7 +64,11 @@ function App() {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let newValue = value;
+    if (["content", "comments", "homework"].includes(name)) {
+      newValue = capitalizeSentences(newValue);
+    }
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
   const handleDownload = () => {
@@ -87,7 +97,7 @@ function App() {
       setFormData((prev) => {
         const current = prev[fieldName as keyof FormData];
         const prefix = current ? current + "\n- " : "- ";
-        return { ...prev, [fieldName]: prefix + transcript };
+        return { ...prev, [fieldName]: capitalizeSentences(prefix + transcript) };
       });
     };
     
