@@ -20,17 +20,26 @@ export interface CanvasEditorRef {
   isReady: boolean;
 }
 
-// Hệ tọa độ dịch lên trên 50 và dịch sang trái 50 theo yêu cầu
+// Hệ tọa độ chuẩn xác dựa trên phân tích ảnh phôi:
+// - Baseline bottom cho các trường trên dòng kẻ chấm
+// - Baseline top cho các trường textarea bên dưới
 const CONFIG = {
   color: "#0f1b81", // Màu xanh mực bút bi thực tế
   fields: {
-    session: { x: 290, y: 200, maxWidth: 150, fontSize: 36 },
-    date: { x: 610, y: 200, maxWidth: 240, fontSize: 36 },
-    teacher: { x: 330, y: 260, maxWidth: 570, fontSize: 36 },
-    tutor: { x: 350, y: 320, maxWidth: 550, fontSize: 36 },
-    content: { x: 70, y: 430, width: 840, height: 160, fontSize: 34, lineGap: 14 },
-    comments: { x: 70, y: 650, width: 840, height: 160, fontSize: 34, lineGap: 14 },
-    homework: { x: 70, y: 870, width: 840, height: 200, fontSize: 34, lineGap: 14 },
+    // Dòng kẻ chấm đầu tiên ở Y=231
+    session: { x: 300, y: 228, maxWidth: 150, fontSize: 36 },
+    date: { x: 700, y: 228, maxWidth: 240, fontSize: 36 },
+    // Dòng kẻ chấm Giảng viên ở Y=342
+    teacher: { x: 400, y: 339, maxWidth: 570, fontSize: 36 },
+    // Dòng kẻ chấm Trợ giảng ở Y=413
+    tutor: { x: 420, y: 410, maxWidth: 550, fontSize: 36 },
+    
+    // NỘI DUNG (Y=565) -> Khoảng trắng bắt đầu từ 600
+    content: { x: 110, y: 600, width: 860, height: 170, fontSize: 34, lineGap: 14 },
+    // NHẬN XÉT (Y=800) -> Khoảng trắng bắt đầu từ 830
+    comments: { x: 110, y: 830, width: 860, height: 170, fontSize: 34, lineGap: 14 },
+    // BÀI TẬP VỀ NHÀ (Y=1037) -> Khoảng trắng bắt đầu từ 1070
+    homework: { x: 110, y: 1070, width: 860, height: 230, fontSize: 34, lineGap: 14 },
   },
 };
 
@@ -89,11 +98,11 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     ctx.drawImage(imageLoaded, 0, 0);
 
     ctx.fillStyle = CONFIG.color;
-    ctx.textBaseline = "top";
 
-    // Hàm vẽ chữ đơn giản (Buổi, Ngày, Giảng viên, Trợ giảng)
+    // Hàm vẽ chữ đơn giản (Buổi, Ngày, Giảng viên, Trợ giảng) đặt NGAY TRÊN dòng kẻ chấm
     const drawSimpleText = (text: string, field: "session" | "date" | "teacher" | "tutor") => {
       const cfg = CONFIG.fields[field];
+      ctx.textBaseline = "bottom"; // Giúp chữ nằm vừa khít lên dòng chấm
       ctx.font = `${cfg.fontSize}px "${fontFamily}"`;
       ctx.fillText(text, cfg.x, cfg.y, cfg.maxWidth);
     };
@@ -112,6 +121,7 @@ const CanvasEditor = forwardRef(function CanvasEditor(
       const cfg = CONFIG.fields[field];
       if (!text.trim()) return;
 
+      ctx.textBaseline = "top"; // Trả lại baseline top cho khối văn bản
       let currentFontSize = cfg.fontSize;
       let lines: string[] = [];
 
