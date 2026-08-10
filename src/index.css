@@ -65,3 +65,10 @@
     scrollbar-width: none;
   }
 }
+
+html, body {
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+  overscroll-behavior-x: none;
+}
