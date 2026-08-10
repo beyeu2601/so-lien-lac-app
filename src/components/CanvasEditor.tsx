@@ -4,6 +4,7 @@ export interface FormData {
   session: string;
   date: string;
   teacher: string;
+  tutor: string;
   content: string;
   comments: string;
   homework: string;
@@ -20,12 +21,13 @@ export interface CanvasEditorRef {
 
 // Hệ tọa độ được tối ưu hóa chuẩn xác (Dịch lên thêm 5px nữa cho Buổi, Ngày, Giảng viên)
 const CONFIG = {
-  fontFamily: "HP001_5_hang_normal",
+  fontFamily: "HP001_5_hang_bold",
   color: "#0f1b81", // Màu xanh mực bút bi thực tế
   fields: {
     session: { x: 325, y: 187, maxWidth: 120, fontSize: 32 },
     date: { x: 580, y: 187, maxWidth: 200, fontSize: 32 },
     teacher: { x: 375, y: 237, maxWidth: 400, fontSize: 32 },
+    tutor: { x: 385, y: 287, maxWidth: 400, fontSize: 32 },
     content: { x: 120, y: 400, width: 620, height: 120, fontSize: 28, lineGap: 12 },
     comments: { x: 120, y: 570, width: 620, height: 120, fontSize: 28, lineGap: 12 },
     homework: { x: 120, y: 740, width: 620, height: 180, fontSize: 28, lineGap: 12 },
@@ -89,8 +91,8 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     ctx.fillStyle = CONFIG.color;
     ctx.textBaseline = "top";
 
-    // Hàm vẽ chữ đơn giản (Buổi, Ngày, Giảng viên)
-    const drawSimpleText = (text: string, field: "session" | "date" | "teacher") => {
+    // Hàm vẽ chữ đơn giản (Buổi, Ngày, Giảng viên, Trợ giảng)
+    const drawSimpleText = (text: string, field: "session" | "date" | "teacher" | "tutor") => {
       const cfg = CONFIG.fields[field];
       ctx.font = `${cfg.fontSize}px ${CONFIG.fontFamily}`;
       ctx.fillText(text, cfg.x, cfg.y, cfg.maxWidth);
@@ -99,6 +101,7 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     drawSimpleText(data.session, "session");
     drawSimpleText(data.date, "date");
     drawSimpleText(data.teacher, "teacher");
+    drawSimpleText(data.tutor, "tutor");
 
     // Hàm vẽ đoạn văn bản nhiều dòng (Nội dung, Nhận xét, Bài tập)
     const drawMultilineText = (

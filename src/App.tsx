@@ -14,6 +14,7 @@ function App() {
     session: "",
     date: getTodayDateString(),
     teacher: "",
+    tutor: "",
     content: "",
     comments: "",
     homework: "",
@@ -92,6 +93,18 @@ function App() {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Trợ giảng</label>
+                <input
+                  type="text"
+                  name="tutor"
+                  value={formData.tutor}
+                  onChange={handleChange}
+                  placeholder="Tên trợ giảng"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none"
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nội dung (Mỗi ý 1 dòng, tự động gạch đầu dòng)
                 </label>
@@ -142,15 +155,20 @@ function App() {
                 <h2 className="text-xl font-semibold text-gray-800">
                   Xem Trước Kết Quả
                 </h2>
-                <button
-                  onClick={handleDownload}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                  Tải Ảnh Xuống
-                </button>
+                <div className="flex flex-col items-end">
+                  <button
+                    onClick={handleDownload}
+                    className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                    Tải Ảnh Xuống
+                  </button>
+                  <span className="text-[10px] text-gray-400 mt-1 block text-right max-w-[200px]">
+                    (Trên ĐT: bấm nút để chia sẻ hoặc nhấn giữ ảnh dưới để lưu)
+                  </span>
+                </div>
               </div>
 
               <CanvasEditor
