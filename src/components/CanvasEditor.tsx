@@ -18,14 +18,14 @@ export interface CanvasEditorRef {
   isReady: boolean;
 }
 
-// Hệ tọa độ được tối ưu hóa chuẩn xác cho phôi ảnh 819x1024 (Đã dịch lên 10px theo feedback điện thoại)
+// Hệ tọa độ được tối ưu hóa chuẩn xác (Dịch lên thêm 5px nữa cho Buổi, Ngày, Giảng viên)
 const CONFIG = {
   fontFamily: "HP001_5_hang_normal",
   color: "#0f1b81", // Màu xanh mực bút bi thực tế
   fields: {
-    session: { x: 325, y: 192, maxWidth: 120, fontSize: 32 },
-    date: { x: 580, y: 192, maxWidth: 200, fontSize: 32 },
-    teacher: { x: 375, y: 242, maxWidth: 400, fontSize: 32 },
+    session: { x: 325, y: 187, maxWidth: 120, fontSize: 32 },
+    date: { x: 580, y: 187, maxWidth: 200, fontSize: 32 },
+    teacher: { x: 375, y: 237, maxWidth: 400, fontSize: 32 },
     content: { x: 120, y: 400, width: 620, height: 120, fontSize: 28, lineGap: 12 },
     comments: { x: 120, y: 570, width: 620, height: 120, fontSize: 28, lineGap: 12 },
     homework: { x: 120, y: 740, width: 620, height: 180, fontSize: 28, lineGap: 12 },
@@ -180,11 +180,31 @@ const CanvasEditor = forwardRef(function CanvasEditor(
   }, [data, fontLoaded, imageLoaded]);
 
   useImperativeHandle(ref, () => ({
-    download: () => {
+    download: async () => {
       if (!canvasRef.current || !imageLoaded) return;
       const dataUrl = canvasRef.current.toDataURL("image/jpeg", 0.9);
+      const filename = `So-Lien-Lac-${data.date.replace(/\//g, "-") || "moi"}.jpg`;
+
+      try {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], filename, { type: "image/jpeg" });
+        
+        // Sử dụng Web Share API trên điện thoại để mở menu chia sẻ/lưu trực tiếp vào Album
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: "Sổ Liên Lạc",
+          });
+          return;
+        }
+      } catch (err) {
+        console.error("Web Share API error, falling back to direct download:", err);
+      }
+
+      // Fallback cho Desktop
       const link = document.createElement("a");
-      link.download = `So-Lien-Lac-${data.date.replace(/\//g, "-") || "moi"}.jpg`;
+      link.download = filename;
       link.href = dataUrl;
       link.click();
     },
