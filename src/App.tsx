@@ -12,11 +12,8 @@ const getTodayDateString = () => {
 const FONTS = [
   { name: "HP001_5_hang_bold", label: "HP001 5 Hàng Bold (Khuyên dùng)" },
   { name: "HP001_5_hang_normal", label: "HP001 5 Hàng Normal" },
-  { name: "HP001_5_hang_1_o_ly", label: "HP001 5 Hàng (Có Ô Ly)" },
   { name: "HP001_4_hang_bold", label: "HP001 4 Hàng Bold" },
   { name: "HP001_4_hang_normal", label: "HP001 4 Hàng Normal" },
-  { name: "HP001_4_hang_1_o_ly", label: "HP001 4 Hàng (1 Ô Ly)" },
-  { name: "HP001_4_hang_2_o_ly", label: "HP001 4 Hàng (2 Ô Ly)" },
   { name: "HLHOCTRO", label: "HL Học Trò (Nét thanh thoát)" },
 ];
 
