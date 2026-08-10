@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ForwardedRef, forwardRef, useImperativeHandle } from "react";
 
 export interface FormData {
+  studentName: string;
   session: string;
   date: string;
   teacher: string;
@@ -26,6 +27,8 @@ export interface CanvasEditorRef {
 const CONFIG = {
   color: "#0f1b81", // Màu xanh mực bút bi thực tế
   fields: {
+    // Dòng kẻ chấm Tên học viên ở Y=271 (baseline=273)
+    studentName: { x: 450, y: 273, maxWidth: 500, fontSize: 36 },
     // Dòng kẻ chấm Buổi / Ngày ở Y=342 (baseline=344)
     session: { x: 330, y: 344, maxWidth: 150, fontSize: 36 },
     date: { x: 730, y: 344, maxWidth: 240, fontSize: 36 },
@@ -99,14 +102,15 @@ const CanvasEditor = forwardRef(function CanvasEditor(
 
     ctx.fillStyle = CONFIG.color;
 
-    // Hàm vẽ chữ đơn giản (Buổi, Ngày, Giảng viên, Trợ giảng) đặt NGAY TRÊN dòng kẻ chấm
-    const drawSimpleText = (text: string, field: "session" | "date" | "teacher" | "tutor") => {
+    // Hàm vẽ chữ đơn giản đặt NGAY TRÊN dòng kẻ chấm
+    const drawSimpleText = (text: string, field: "studentName" | "session" | "date" | "teacher" | "tutor") => {
       const cfg = CONFIG.fields[field];
       ctx.textBaseline = "bottom"; // Giúp chữ nằm vừa khít lên dòng chấm
       ctx.font = `${cfg.fontSize}px "${fontFamily}"`;
       ctx.fillText(text, cfg.x, cfg.y, cfg.maxWidth);
     };
 
+    drawSimpleText(data.studentName, "studentName");
     drawSimpleText(data.session, "session");
     drawSimpleText(data.date, "date");
     drawSimpleText(data.teacher, "teacher");

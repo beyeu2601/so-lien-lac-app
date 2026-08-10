@@ -17,8 +17,29 @@ const FONTS = [
   { name: "HLHOCTRO", label: "HL Học Trò (Nét thanh thoát)" },
 ];
 
+function VoiceInputButton({ isListening, onStart }: { isListening: boolean; onStart: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onStart}
+      className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md transition-colors border ${
+        isListening
+          ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
+          : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+      }`}
+      title="Nhập bằng giọng nói"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+      </svg>
+      {isListening ? "Đang nghe..." : "Giọng nói"}
+    </button>
+  );
+}
+
 function App() {
   const [formData, setFormData] = useState<FormData>({
+    studentName: "",
     session: "",
     date: getTodayDateString(),
     teacher: "",
@@ -29,6 +50,7 @@ function App() {
   });
 
   const [fontFamily, setFontFamily] = useState(FONTS[0].name);
+  const [listeningField, setListeningField] = useState<string | null>(null);
 
   const canvasRef = useRef<CanvasEditorRef>(null);
 
@@ -43,6 +65,45 @@ function App() {
     if (canvasRef.current) {
       canvasRef.current.download();
     }
+  };
+
+  const startVoiceDictation = (fieldName: string) => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Trình duyệt của bạn không hỗ trợ nhận diện giọng nói. Vui lòng sử dụng Google Chrome hoặc Microsoft Edge.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "vi-VN";
+    recognition.interimResults = false;
+    
+    recognition.onstart = () => {
+      setListeningField(fieldName);
+    };
+    
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setFormData((prev) => {
+        const current = prev[fieldName as keyof FormData];
+        const prefix = current ? current + "\n- " : "- ";
+        return { ...prev, [fieldName]: current ? current + "\n" + transcript : transcript };
+      });
+    };
+    
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+      if (event.error === "not-allowed") {
+        alert("Vui lòng cấp quyền sử dụng Micro cho trình duyệt để dùng tính năng này.");
+      }
+      setListeningField(null);
+    };
+    
+    recognition.onend = () => {
+      setListeningField(null);
+    };
+    
+    recognition.start();
   };
 
   return (
@@ -85,6 +146,18 @@ function App() {
             </h2>
 
             <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tên học viên</label>
+                <input
+                  type="text"
+                  name="studentName"
+                  value={formData.studentName}
+                  onChange={handleChange}
+                  placeholder="Tên học viên"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-sm font-medium text-blue-700"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Buổi</label>
@@ -135,9 +208,15 @@ function App() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nội dung (Mỗi ý 1 dòng, tự động gạch đầu dòng)
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Nội dung (Mỗi ý 1 dòng)
+                  </label>
+                  <VoiceInputButton
+                    isListening={listeningField === "content"}
+                    onStart={() => startVoiceDictation("content")}
+                  />
+                </div>
                 <textarea
                   name="content"
                   value={formData.content}
@@ -149,9 +228,15 @@ function App() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nhận xét (Mỗi ý 1 dòng, tự động gạch đầu dòng)
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Nhận xét (Mỗi ý 1 dòng)
+                  </label>
+                  <VoiceInputButton
+                    isListening={listeningField === "comments"}
+                    onStart={() => startVoiceDictation("comments")}
+                  />
+                </div>
                 <textarea
                   name="comments"
                   value={formData.comments}
@@ -163,9 +248,15 @@ function App() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Bài tập về nhà
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Bài tập về nhà
+                  </label>
+                  <VoiceInputButton
+                    isListening={listeningField === "homework"}
+                    onStart={() => startVoiceDictation("homework")}
+                  />
+                </div>
                 <textarea
                   name="homework"
                   value={formData.homework}
