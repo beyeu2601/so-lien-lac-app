@@ -70,7 +70,7 @@ function App() {
   const startVoiceDictation = (fieldName: string) => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("Trình duyệt của bạn không hỗ trợ nhận diện giọng nói. Vui lòng sử dụng Google Chrome hoặc Microsoft Edge.");
+      alert("Trình duyệt hoặc thiết bị của bạn không hỗ trợ tính năng này của web.\n\nMẸO: Trên điện thoại, bạn hãy bấm vào ô nhập chữ, rồi dùng nút Micro 🎤 có sẵn trên BÀN PHÍM ẢO của máy để đọc chính tả. Cách này sẽ mượt và chính xác hơn rất nhiều!");
       return;
     }
 
@@ -95,6 +95,12 @@ function App() {
       console.error("Speech recognition error:", event.error);
       if (event.error === "not-allowed") {
         alert("Vui lòng cấp quyền sử dụng Micro cho trình duyệt để dùng tính năng này.");
+      } else if (event.error === "network") {
+        alert("Lỗi kết nối mạng khi nhận diện giọng nói.");
+      } else if (event.error === "no-speech") {
+        alert("Không nghe thấy âm thanh. Vui lòng nói to hơn.");
+      } else {
+        alert("Lỗi nhận diện giọng nói: " + event.error + ". Mẹo: Trên điện thoại, bạn nên dùng nút Micro tích hợp sẵn trên bàn phím ảo sẽ mượt hơn rất nhiều.");
       }
       setListeningField(null);
     };
