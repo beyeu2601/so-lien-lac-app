@@ -1,0 +1,226 @@
+import { useEffect, useRef, useState, type ForwardedRef, forwardRef, useImperativeHandle } from "react";
+
+export interface FormData {
+  session: string;
+  date: string;
+  teacher: string;
+  content: string;
+  comments: string;
+  homework: string;
+}
+
+interface CanvasEditorProps {
+  data: FormData;
+}
+
+export interface CanvasEditorRef {
+  download: () => void;
+  isReady: boolean;
+}
+
+// Hệ tọa độ được tối ưu hóa chuẩn xác cho phôi ảnh 819x1024 (Đã dịch lên 10px theo feedback điện thoại)
+const CONFIG = {
+  fontFamily: "HP001_5_hang_normal",
+  color: "#0f1b81", // Màu xanh mực bút bi thực tế
+  fields: {
+    session: { x: 325, y: 192, maxWidth: 120, fontSize: 32 },
+    date: { x: 580, y: 192, maxWidth: 200, fontSize: 32 },
+    teacher: { x: 375, y: 242, maxWidth: 400, fontSize: 32 },
+    content: { x: 120, y: 400, width: 620, height: 120, fontSize: 28, lineGap: 12 },
+    comments: { x: 120, y: 570, width: 620, height: 120, fontSize: 28, lineGap: 12 },
+    homework: { x: 120, y: 740, width: 620, height: 180, fontSize: 28, lineGap: 12 },
+  },
+};
+
+const CanvasEditor = forwardRef(function CanvasEditor(
+  { data }: CanvasEditorProps,
+  ref: ForwardedRef<CanvasEditorRef>
+) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [imageLoaded, setImageLoaded] = useState<HTMLImageElement | null>(null);
+  const [fontLoaded, setFontLoaded] = useState(false);
+  const [imgDataUrl, setImgDataUrl] = useState<string>("");
+
+  // Chờ load font viết chữ đẹp
+  useEffect(() => {
+    setFontLoaded(false);
+    
+    if (document.fonts.check(`12px "${CONFIG.fontFamily}"`)) {
+      setFontLoaded(true);
+      return;
+    }
+
+    const loadFont = async () => {
+      try {
+        await document.fonts.load(`12px "${CONFIG.fontFamily}"`);
+        setFontLoaded(true);
+      } catch (err) {
+        console.error("Lỗi tải font HP001:", err);
+        setFontLoaded(true); // Fallback
+      }
+    };
+    loadFont();
+  }, []);
+
+  // Tải phôi ảnh mặc định duy nhất
+  useEffect(() => {
+    const img = new Image();
+    img.src = "/templates/so-lien-lac-template.png";
+    img.onload = () => setImageLoaded(img);
+    img.onerror = () => {
+      console.error("Không thể tải phôi ảnh mặc định tại public/templates/so-lien-lac-template.png");
+    };
+  }, []);
+
+  // Vẽ Canvas
+  useEffect(() => {
+    if (!fontLoaded || !imageLoaded || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = imageLoaded.width;
+    canvas.height = imageLoaded.height;
+
+    // Vẽ ảnh nền
+    ctx.drawImage(imageLoaded, 0, 0);
+
+    ctx.fillStyle = CONFIG.color;
+    ctx.textBaseline = "top";
+
+    // Hàm vẽ chữ đơn giản (Buổi, Ngày, Giảng viên)
+    const drawSimpleText = (text: string, field: "session" | "date" | "teacher") => {
+      const cfg = CONFIG.fields[field];
+      ctx.font = `${cfg.fontSize}px ${CONFIG.fontFamily}`;
+      ctx.fillText(text, cfg.x, cfg.y, cfg.maxWidth);
+    };
+
+    drawSimpleText(data.session, "session");
+    drawSimpleText(data.date, "date");
+    drawSimpleText(data.teacher, "teacher");
+
+    // Hàm vẽ đoạn văn bản nhiều dòng (Nội dung, Nhận xét, Bài tập)
+    const drawMultilineText = (
+      text: string,
+      field: "content" | "comments" | "homework",
+      addBullets = false
+    ) => {
+      const cfg = CONFIG.fields[field];
+      if (!text.trim()) return;
+
+      let currentFontSize = cfg.fontSize;
+      let lines: string[] = [];
+
+      // Xử lý xuống dòng & tự động thêm gạch đầu dòng
+      const rawLines = text.split("\n").filter((l) => l.trim() !== "");
+      let processedText = text;
+
+      if (addBullets) {
+        processedText = rawLines
+          .map((l) => {
+            const trimmed = l.trim();
+            if (trimmed.startsWith("-") || trimmed.startsWith("+") || trimmed.startsWith("*")) {
+              return trimmed;
+            }
+            return `- ${trimmed}`;
+          })
+          .join("\n");
+      }
+
+      // Hàm tính toán bẻ dòng
+      const calculateLines = (fontSize: number) => {
+        ctx.font = `${fontSize}px ${CONFIG.fontFamily}`;
+        const calculatedLines: string[] = [];
+        const paragraphs = processedText.split("\n");
+
+        paragraphs.forEach((p) => {
+          let currentLine = "";
+          const words = p.split(" ");
+
+          for (let i = 0; i < words.length; i++) {
+            const testLine = currentLine + words[i] + " ";
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > cfg.width && i > 0) {
+              calculatedLines.push(currentLine);
+              currentLine = words[i] + " ";
+            } else {
+              currentLine = testLine;
+            }
+          }
+          calculatedLines.push(currentLine);
+        });
+        return calculatedLines;
+      };
+
+      // Tự động thu nhỏ font size nếu nội dung quá nhiều (không bị viết tràn lan)
+      while (currentFontSize > 12) {
+        lines = calculateLines(currentFontSize);
+        const totalHeight = lines.length * (currentFontSize + cfg.lineGap);
+        if (totalHeight <= cfg.height) break;
+        currentFontSize -= 2;
+      }
+
+      // Thực thi vẽ lên Canvas
+      ctx.font = `${currentFontSize}px ${CONFIG.fontFamily}`;
+      let cursorY = cfg.y;
+      lines.forEach((line) => {
+        ctx.fillText(line.trim(), cfg.x, cursorY);
+        cursorY += currentFontSize + cfg.lineGap;
+      });
+    };
+
+    drawMultilineText(data.content, "content", true);
+    drawMultilineText(data.comments, "comments", true);
+    drawMultilineText(data.homework, "homework", false);
+
+    // Export ra DataURL để hiển thị thẻ <img> hỗ trợ lưu trực tiếp trên điện thoại
+    setImgDataUrl(canvas.toDataURL("image/jpeg", 0.9));
+
+  }, [data, fontLoaded, imageLoaded]);
+
+  useImperativeHandle(ref, () => ({
+    download: () => {
+      if (!canvasRef.current || !imageLoaded) return;
+      const dataUrl = canvasRef.current.toDataURL("image/jpeg", 0.9);
+      const link = document.createElement("a");
+      link.download = `So-Lien-Lac-${data.date.replace(/\//g, "-") || "moi"}.jpg`;
+      link.href = dataUrl;
+      link.click();
+    },
+    isReady: !!imageLoaded,
+  }));
+
+  if (!imageLoaded) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-gray-500 text-center border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 min-h-[400px]">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mb-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <p className="text-lg font-medium">Đang tải phôi ảnh...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full overflow-hidden border border-gray-200 rounded-xl shadow-sm bg-white max-w-[550px] flex flex-col items-center">
+      {/* Canvas ẩn đi, chỉ dùng để vẽ */}
+      <canvas
+        ref={canvasRef}
+        style={{ display: "none" }}
+      />
+      {/* Hiển thị thẻ <img> thật để người dùng mobile có thể đè ngón tay lưu trực tiếp vào Photos */}
+      {imgDataUrl ? (
+        <img
+          src={imgDataUrl}
+          className="w-full h-auto block select-none"
+          alt="Xem trước Sổ Liên Lạc"
+        />
+      ) : (
+        <div className="p-8 text-gray-500">Đang khởi tạo bản xem trước...</div>
+      )}
+    </div>
+  );
+});
+
+export default CanvasEditor;
