@@ -24,13 +24,13 @@ const CONFIG = {
   fontFamily: "HP001_5_hang_bold",
   color: "#0f1b81", // Màu xanh mực bút bi thực tế
   fields: {
-    session: { x: 325, y: 187, maxWidth: 120, fontSize: 32 },
-    date: { x: 580, y: 187, maxWidth: 200, fontSize: 32 },
-    teacher: { x: 375, y: 237, maxWidth: 400, fontSize: 32 },
-    tutor: { x: 385, y: 287, maxWidth: 400, fontSize: 32 },
-    content: { x: 120, y: 400, width: 620, height: 120, fontSize: 28, lineGap: 12 },
-    comments: { x: 120, y: 570, width: 620, height: 120, fontSize: 28, lineGap: 12 },
-    homework: { x: 120, y: 740, width: 620, height: 180, fontSize: 28, lineGap: 12 },
+    session: { x: 350, y: 250, maxWidth: 150, fontSize: 36 },
+    date: { x: 720, y: 250, maxWidth: 240, fontSize: 36 },
+    teacher: { x: 390, y: 310, maxWidth: 570, fontSize: 36 },
+    tutor: { x: 410, y: 370, maxWidth: 550, fontSize: 36 },
+    content: { x: 120, y: 480, width: 840, height: 160, fontSize: 34, lineGap: 14 },
+    comments: { x: 120, y: 700, width: 840, height: 160, fontSize: 34, lineGap: 14 },
+    homework: { x: 120, y: 920, width: 840, height: 200, fontSize: 34, lineGap: 14 },
   },
 };
 
