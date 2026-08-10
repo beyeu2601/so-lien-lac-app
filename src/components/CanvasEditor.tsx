@@ -26,13 +26,13 @@ export interface CanvasEditorRef {
 const CONFIG = {
   color: "#0f1b81", // Màu xanh mực bút bi thực tế
   fields: {
-    // Dòng kẻ chấm Buổi / Ngày ở Y=342 (baseline=340)
-    session: { x: 300, y: 340, maxWidth: 150, fontSize: 36 },
-    date: { x: 700, y: 340, maxWidth: 240, fontSize: 36 },
-    // Dòng kẻ chấm Giảng viên ở Y=413 (baseline=411)
-    teacher: { x: 400, y: 411, maxWidth: 570, fontSize: 36 },
-    // Dòng kẻ chấm Trợ giảng ở Y=484 (baseline=482)
-    tutor: { x: 420, y: 482, maxWidth: 550, fontSize: 36 },
+    // Dòng kẻ chấm Buổi / Ngày ở Y=342 (baseline=344)
+    session: { x: 330, y: 344, maxWidth: 150, fontSize: 36 },
+    date: { x: 730, y: 344, maxWidth: 240, fontSize: 36 },
+    // Dòng kẻ chấm Giảng viên ở Y=413 (baseline=415)
+    teacher: { x: 430, y: 415, maxWidth: 570, fontSize: 36 },
+    // Dòng kẻ chấm Trợ giảng ở Y=484 (baseline=486)
+    tutor: { x: 450, y: 486, maxWidth: 550, fontSize: 36 },
     
     // NỘI DUNG (Y=565) -> Khoảng trắng bắt đầu từ 600
     content: { x: 110, y: 600, width: 860, height: 170, fontSize: 34, lineGap: 14 },
