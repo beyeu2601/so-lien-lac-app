@@ -87,7 +87,7 @@ function App() {
       setFormData((prev) => {
         const current = prev[fieldName as keyof FormData];
         const prefix = current ? current + "\n- " : "- ";
-        return { ...prev, [fieldName]: current ? current + "\n" + transcript : transcript };
+        return { ...prev, [fieldName]: prefix + transcript };
       });
     };
     
