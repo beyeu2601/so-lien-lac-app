@@ -10,17 +10,15 @@ const getTodayDateString = () => {
 };
 
 const FONTS = [
-  { name: "HP001_5_hang_bold", label: "HP001 5 Hàng Bold (Khuyên dùng)" },
+  { name: "Patrick Hand", label: "Patrick Hand (Mặc định - Viết tay)" },
+  { name: "HP001_5_hang_bold", label: "HP001 5 Hàng Bold" },
   { name: "HP001_5_hang_normal", label: "HP001 5 Hàng Normal" },
   { name: "HP001_4_hang_bold", label: "HP001 4 Hàng Bold" },
   { name: "HP001_4_hang_normal", label: "HP001 4 Hàng Normal" },
   { name: "HLHOCTRO", label: "HL Học Trò (Nét thanh thoát)" },
   { name: "Arial", label: "Arial (Cơ bản - Không chân)" },
   { name: "Times New Roman", label: "Times New Roman (Cơ bản - Có chân)" },
-  { name: "Tahoma", label: "Tahoma (Cơ bản - Tròn trịa)" },
-  { name: "Caveat", label: "Caveat (Viết tay Google)" },
   { name: "Dancing Script", label: "Dancing Script (Viết tay Google)" },
-  { name: "Patrick Hand", label: "Patrick Hand (Viết tay Google)" },
 ];
 
 function VoiceInputButton({ isListening, onStart }: { isListening: boolean; onStart: () => void }) {
