@@ -194,7 +194,7 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     // Export ra DataURL để hiển thị thẻ <img> hỗ trợ lưu trực tiếp trên điện thoại
     setImgDataUrl(canvas.toDataURL("image/jpeg", 0.9));
 
-  }, [data, fontLoaded, imageLoaded, fontFamily]);
+  }, [data, fontLoaded, imageLoaded, fontFamily, fontColor]);
 
   useImperativeHandle(ref, () => ({
     download: async () => {
