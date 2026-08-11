@@ -21,7 +21,55 @@ const FONTS = [
   { name: "Dancing Script", label: "Dancing Script (Viết tay Google)" },
 ];
 
-function VoiceInputButton({ isListening, onStart }: { isListening: boolean; onStart: () => void }) {
+type AppTheme = "blue" | "green" | "pink";
+
+const THEMES: Record<AppTheme, {
+  name: string;
+  bg: string;
+  primary: string;
+  primaryHover: string;
+  textPrimary: string;
+  ring: string;
+  voiceHoverBg: string;
+  voiceHoverText: string;
+  voiceHoverBorder: string;
+}> = {
+  blue: {
+    name: "Xanh Dương",
+    bg: "bg-blue-50",
+    primary: "bg-blue-600",
+    primaryHover: "hover:bg-blue-700",
+    textPrimary: "text-blue-700",
+    ring: "focus:ring-blue-500 focus:border-blue-500",
+    voiceHoverBg: "hover:bg-blue-50",
+    voiceHoverText: "hover:text-blue-600",
+    voiceHoverBorder: "hover:border-blue-200",
+  },
+  green: {
+    name: "Xanh lá Academy",
+    bg: "bg-emerald-50",
+    primary: "bg-emerald-600",
+    primaryHover: "hover:bg-emerald-700",
+    textPrimary: "text-emerald-700",
+    ring: "focus:ring-emerald-500 focus:border-emerald-500",
+    voiceHoverBg: "hover:bg-emerald-50",
+    voiceHoverText: "hover:text-emerald-600",
+    voiceHoverBorder: "hover:border-emerald-200",
+  },
+  pink: {
+    name: "Hồng Pastel",
+    bg: "bg-pink-50",
+    primary: "bg-pink-500",
+    primaryHover: "hover:bg-pink-600",
+    textPrimary: "text-pink-600",
+    ring: "focus:ring-pink-400 focus:border-pink-400",
+    voiceHoverBg: "hover:bg-pink-50",
+    voiceHoverText: "hover:text-pink-500",
+    voiceHoverBorder: "hover:border-pink-200",
+  }
+};
+
+function VoiceInputButton({ isListening, onStart, theme }: { isListening: boolean; onStart: () => void; theme: any }) {
   return (
     <button
       type="button"
@@ -29,7 +77,7 @@ function VoiceInputButton({ isListening, onStart }: { isListening: boolean; onSt
       className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md transition-colors border ${
         isListening
           ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
-          : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+          : `bg-gray-50 text-gray-600 border-gray-200 ${theme.voiceHoverBg} ${theme.voiceHoverText} ${theme.voiceHoverBorder}`
       }`}
       title="Nhập bằng giọng nói"
     >
@@ -62,6 +110,9 @@ function App() {
   const [fontFamily, setFontFamily] = useState(FONTS[0].name);
   const [fontColor, setFontColor] = useState("#0f1b81");
   const [listeningField, setListeningField] = useState<string | null>(null);
+  const [appTheme, setAppTheme] = useState<AppTheme>("blue");
+  
+  const currentTheme = THEMES[appTheme];
 
   const canvasRef = useRef<CanvasEditorRef>(null);
 
@@ -128,7 +179,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className={`min-h-screen ${currentTheme.bg} py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-500`}>
       <div className="max-w-6xl mx-auto">
         <header className="mb-8 text-center lg:text-left">
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
@@ -147,12 +198,31 @@ function App() {
                 Cấu Hình Chung
               </h2>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Giao Diện Ứng Dụng (Theme)
+              </label>
+              <div className="flex flex-wrap gap-3 mb-4">
+                {(Object.keys(THEMES) as AppTheme[]).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setAppTheme(key)}
+                    className={`px-4 py-1.5 text-sm rounded-full border transition-all ${
+                      appTheme === key
+                        ? `${THEMES[key].bg} ${THEMES[key].textPrimary} border-current font-medium shadow-sm`
+                        : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+                    }`}
+                  >
+                    {THEMES[key].name}
+                  </button>
+                ))}
+              </div>
+
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Chọn Phông Chữ Luyện Viết
               </label>
               <select
                 value={fontFamily}
                 onChange={(e) => setFontFamily(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none bg-white text-sm"
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 transition-shadow outline-none bg-white text-sm ${currentTheme.ring}`}
               >
                 {FONTS.map((font) => (
                   <option key={font.name} value={font.name}>
@@ -193,7 +263,7 @@ function App() {
                   value={formData.studentName}
                   onChange={handleChange}
                   placeholder="Tên học viên"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-sm font-medium text-blue-700"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 transition-shadow outline-none text-sm font-medium ${currentTheme.ring} ${currentTheme.textPrimary}`}
                 />
               </div>
 
@@ -206,7 +276,7 @@ function App() {
                     value={formData.session}
                     onChange={handleChange}
                     placeholder="Ví dụ: 12"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-sm"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 transition-shadow outline-none text-sm ${currentTheme.ring}`}
                   />
                 </div>
                 <div>
@@ -217,7 +287,7 @@ function App() {
                     value={formData.date}
                     onChange={handleChange}
                     placeholder="10/08/2026"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-sm"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 transition-shadow outline-none text-sm ${currentTheme.ring}`}
                   />
                 </div>
               </div>
@@ -230,7 +300,7 @@ function App() {
                   value={formData.teacher}
                   onChange={handleChange}
                   placeholder="Tên giảng viên"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-sm"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 transition-shadow outline-none text-sm ${currentTheme.ring}`}
                 />
               </div>
 
@@ -242,7 +312,7 @@ function App() {
                   value={formData.tutor}
                   onChange={handleChange}
                   placeholder="Tên trợ giảng"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow outline-none text-sm"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 transition-shadow outline-none text-sm ${currentTheme.ring}`}
                 />
               </div>
 
@@ -254,6 +324,7 @@ function App() {
                   <VoiceInputButton
                     isListening={listeningField === "content"}
                     onStart={() => startVoiceDictation("content")}
+                    theme={currentTheme}
                   />
                 </div>
                 <textarea
@@ -262,7 +333,7 @@ function App() {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Học bài mới...&#10;Làm bài tập..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none outline-none text-sm"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 transition-shadow resize-none outline-none text-sm ${currentTheme.ring}`}
                 />
               </div>
 
@@ -274,6 +345,7 @@ function App() {
                   <VoiceInputButton
                     isListening={listeningField === "comments"}
                     onStart={() => startVoiceDictation("comments")}
+                    theme={currentTheme}
                   />
                 </div>
                 <textarea
@@ -282,7 +354,7 @@ function App() {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Con học tốt...&#10;Cần cố gắng thêm..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none outline-none text-sm"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 transition-shadow resize-none outline-none text-sm ${currentTheme.ring}`}
                 />
               </div>
 
@@ -294,6 +366,7 @@ function App() {
                   <VoiceInputButton
                     isListening={listeningField === "homework"}
                     onStart={() => startVoiceDictation("homework")}
+                    theme={currentTheme}
                   />
                 </div>
                 <textarea
@@ -302,7 +375,7 @@ function App() {
                   onChange={handleChange}
                   rows={2}
                   placeholder="Làm bài tập trang 12..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none outline-none text-sm"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 transition-shadow resize-none outline-none text-sm ${currentTheme.ring}`}
                 />
               </div>
             </div>
@@ -318,7 +391,7 @@ function App() {
                 <div className="flex flex-col items-end">
                   <button
                     onClick={handleDownload}
-                    className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2"
+                    className={`px-5 py-2 ${currentTheme.primary} ${currentTheme.primaryHover} text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2`}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
