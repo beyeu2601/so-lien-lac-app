@@ -14,6 +14,7 @@ export interface FormData {
 interface CanvasEditorProps {
   data: FormData;
   fontFamily: string;
+  fontColor: string;
 }
 
 export interface CanvasEditorRef {
@@ -25,7 +26,6 @@ export interface CanvasEditorRef {
 // - Baseline bottom cho các trường trên dòng kẻ chấm
 // - Baseline top cho các trường textarea bên dưới
 const CONFIG = {
-  color: "#0f1b81", // Màu xanh mực bút bi thực tế
   fields: {
     // Dòng kẻ chấm Tên học viên ở Y=271 (baseline=273)
     studentName: { x: 450, y: 273, maxWidth: 500, fontSize: 36 },
@@ -47,7 +47,7 @@ const CONFIG = {
 };
 
 const CanvasEditor = forwardRef(function CanvasEditor(
-  { data, fontFamily }: CanvasEditorProps,
+  { data, fontFamily, fontColor }: CanvasEditorProps,
   ref: ForwardedRef<CanvasEditorRef>
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -100,7 +100,7 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     // Vẽ ảnh nền
     ctx.drawImage(imageLoaded, 0, 0);
 
-    ctx.fillStyle = CONFIG.color;
+    ctx.fillStyle = fontColor;
 
     // Hàm vẽ chữ đơn giản đặt NGAY TRÊN dòng kẻ chấm
     const drawSimpleText = (text: string, field: "studentName" | "session" | "date" | "teacher" | "tutor") => {

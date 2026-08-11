@@ -15,6 +15,12 @@ const FONTS = [
   { name: "HP001_4_hang_bold", label: "HP001 4 Hàng Bold" },
   { name: "HP001_4_hang_normal", label: "HP001 4 Hàng Normal" },
   { name: "HLHOCTRO", label: "HL Học Trò (Nét thanh thoát)" },
+  { name: "Arial", label: "Arial (Cơ bản - Không chân)" },
+  { name: "Times New Roman", label: "Times New Roman (Cơ bản - Có chân)" },
+  { name: "Tahoma", label: "Tahoma (Cơ bản - Tròn trịa)" },
+  { name: "Caveat", label: "Caveat (Viết tay Google)" },
+  { name: "Dancing Script", label: "Dancing Script (Viết tay Google)" },
+  { name: "Patrick Hand", label: "Patrick Hand (Viết tay Google)" },
 ];
 
 function VoiceInputButton({ isListening, onStart }: { isListening: boolean; onStart: () => void }) {
@@ -56,6 +62,7 @@ function App() {
   });
 
   const [fontFamily, setFontFamily] = useState(FONTS[0].name);
+  const [fontColor, setFontColor] = useState("#0f1b81");
   const [listeningField, setListeningField] = useState<string | null>(null);
 
   const canvasRef = useRef<CanvasEditorRef>(null);
@@ -155,6 +162,24 @@ function App() {
                   </option>
                 ))}
               </select>
+
+              <label className="block text-sm font-medium text-gray-700 mb-2 mt-4">
+                Chọn Màu Mực
+              </label>
+              <div className="flex gap-6">
+                <label className="inline-flex items-center cursor-pointer">
+                  <input type="radio" className="w-4 h-4 text-blue-800 accent-blue-800" name="fontColor" value="#0f1b81" checked={fontColor === "#0f1b81"} onChange={(e) => setFontColor(e.target.value)} />
+                  <span className="ml-2 text-sm text-gray-800 font-medium">Xanh (Bút bi)</span>
+                </label>
+                <label className="inline-flex items-center cursor-pointer">
+                  <input type="radio" className="w-4 h-4 text-black accent-black" name="fontColor" value="#111111" checked={fontColor === "#111111"} onChange={(e) => setFontColor(e.target.value)} />
+                  <span className="ml-2 text-sm text-gray-800 font-medium">Đen</span>
+                </label>
+                <label className="inline-flex items-center cursor-pointer">
+                  <input type="radio" className="w-4 h-4 text-red-600 accent-red-600" name="fontColor" value="#d10000" checked={fontColor === "#d10000"} onChange={(e) => setFontColor(e.target.value)} />
+                  <span className="ml-2 text-sm text-gray-800 font-medium">Đỏ</span>
+                </label>
+              </div>
             </div>
 
             <h2 className="text-xl font-semibold text-gray-800 pb-2 border-b">
@@ -312,6 +337,7 @@ function App() {
                 ref={canvasRef}
                 data={formData}
                 fontFamily={fontFamily}
+                fontColor={fontColor}
               />
               <p className="text-xs text-gray-400 text-center mt-2">
                 * Trên điện thoại: Nhấn giữ vào hình ảnh trên và chọn <strong>"Lưu vào ảnh" (Save to Photos)</strong> để lưu trực tiếp vào thư viện máy.
