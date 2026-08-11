@@ -44,7 +44,7 @@ function VoiceInputButton({ isListening, onStart }: { isListening: boolean; onSt
 }
 
 const capitalizeSentences = (text: string) => {
-  return text.replace(/(^[^a-zA-ZÀ-ỹ]*|[\.\!\?]\s+)([a-zà-ỹ])/gm, (match, p1, p2) => {
+  return text.replace(/(^[^a-zA-ZÀ-ỹ]*|[\.\!\?]\s+)([a-zà-ỹ])/gm, (_, p1, p2) => {
     return p1 + p2.toUpperCase();
   });
 };
